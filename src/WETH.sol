@@ -26,7 +26,7 @@ contract WETH is ERC20{
     }
 
     function withdraw(uint amount) public {
-        require(balanceOf(msg.sender) >= amount);
+        require(balanceOf(msg.sender) >= amount, "not enough weth");
         _burn(msg.sender, amount);
         payable(msg.sender).transfer(amount);
         emit Withdrawal(msg.sender, amount);

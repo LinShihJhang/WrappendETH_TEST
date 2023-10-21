@@ -27,9 +27,6 @@ contract WETHTest is Test {
         deal(address(this), 10 ether);
         deal(address(weth), 10 ether);
         deal(address(weth), address(this), 5 ether);
-        deal(address(weth), address(0), 5 ether);
-
-        beforeBurnAddressWETHBalance = weth.balanceOf(address(0));
 
         beforeTestContractWETHBalance = weth.balanceOf(address(this));
         beforeTestContractETHBalance = address(this).balance;
@@ -55,19 +52,16 @@ contract WETHTest is Test {
         vm.expectEmit(true, false, false, true, address(weth));
         emit Transfer(address(this), address(0), 1 ether);
         emit Withdrawal(address(this), 1 ether);
-        
-        //address(0) 不會增加？ 有過 Transfer(address(this), address(0), 1 ether);
-        console2.log("before weth.balanceOf(address(0))",weth.balanceOf(address(0)));
-
         weth.withdraw(1 ether);
-
-        //address(0) 不會增加？ 有過 Transfer(address(this), address(0), 1 ether);
-        console2.log("after weth.balanceOf(address(0))",weth.balanceOf(address(0)));
-        //assertEq(weth.balanceOf(address(0)) - beforeBurnAddressWETHBalance, 1 ether);
-
         assertEq(beforeTestContractWETHBalance - weth.balanceOf(address(this)), 1 ether);
-
         assertEq(address(this).balance - beforeTestContractETHBalance, 1 ether);
+
+        //---------
+        vm.expectRevert(bytes("not enough weth"));
+        weth.withdraw(10000 ether);
+
+
+
     }
 
     function testTransfer() public {
